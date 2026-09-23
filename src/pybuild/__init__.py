@@ -1,5 +1,28 @@
 import argparse
 from collections.abc import Sequence
+from typing import Literal, TypeAlias, cast
+
+
+class BuildArgs(argparse.Namespace):
+    command: Literal["build"]
+    input_dir: str
+    output_dir: str
+    clean: bool
+
+
+class InitArgs(argparse.Namespace):
+    command: Literal["init"]
+    name: str
+    template: str
+
+
+class ServeArgs(argparse.Namespace):
+    command: Literal["serve"]
+    host: str
+    port: int
+
+
+CLIArgs: TypeAlias = BuildArgs | InitArgs | ServeArgs
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -16,11 +39,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     build.add_argument(
         "--input-dir",
+        type=str,
         default=".",
         help="Directory containing site content and templates",
     )
     build.add_argument(
         "--output-dir",
+        type=str,
         default="_site",
         help="Directory where the generated site should be written",
     )
@@ -35,9 +60,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="create a new site scaffold",
         description="Create a new static site project in a directory.",
     )
-    init.add_argument("name", help="Name of the site project or target directory")
+    init.add_argument(
+        "name",
+        type=str,
+        help="Name of the site project or target directory",
+    )
     init.add_argument(
         "--template",
+        type=str,
         choices=("minimal", "blog", "docs"),
         default="minimal",
         help="Template to scaffold for the new site",
@@ -49,7 +79,10 @@ def build_parser() -> argparse.ArgumentParser:
         description="Serve the generated site with a local development server.",
     )
     serve.add_argument(
-        "--host", default="127.0.0.1", help="Host interface to bind the server to"
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Host interface to bind the server to",
     )
     serve.add_argument(
         "--port", type=int, default=8000, help="Port to serve the site on"
@@ -58,12 +91,25 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: Sequence[str] | None = None) -> int:
+def parse_args(argv: Sequence[str] | None = None) -> CLIArgs:
     parser = build_parser()
-    args = parser.parse_args(argv)
+    args = cast(CLIArgs, parser.parse_args(argv))
 
     if args.command == "build":
-        print(f"Building site from {args.source!r} to {args.output_dir!r}")
+        return cast(BuildArgs, args)
+    if args.command == "init":
+        return cast(InitArgs, args)
+    if args.command == "serve":
+        return cast(ServeArgs, args)
+
+    raise ValueError(f"Unsupported command: {args.command!r}")
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = parse_args(argv)
+
+    if args.command == "build":
+        print(f"Building site from {args.input_dir!r} to {args.output_dir!r}")
     elif args.command == "init":
         print(f"Initializing {args.name!r} using the {args.template!r} template")
     elif args.command == "serve":
