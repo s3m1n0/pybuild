@@ -14,7 +14,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="build a static site",
         description="Generate a static site from the source directory.",
     )
-    build.add_argument("source", help="Directory containing site content and templates")
+    build.add_argument(
+        "--input-dir",
+        default=".",
+        help="Directory containing site content and templates",
+    )
     build.add_argument(
         "--output-dir",
         default="_site",
