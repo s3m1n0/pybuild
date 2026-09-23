@@ -1,6 +1,6 @@
 import argparse
 from collections.abc import Sequence
-from typing import Literal, TypeAlias, cast
+from typing import Literal, cast
 
 
 class BuildArgs(argparse.Namespace):
@@ -22,7 +22,7 @@ class ServeArgs(argparse.Namespace):
     port: int
 
 
-CLIArgs: TypeAlias = BuildArgs | InitArgs | ServeArgs
+type CLIArgs = BuildArgs | InitArgs | ServeArgs
 
 
 def build_parser() -> argparse.ArgumentParser:

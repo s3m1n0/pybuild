@@ -1,5 +1,3 @@
-import argparse
-
 from pybuild import build_parser
 
 
