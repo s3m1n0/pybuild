@@ -16,21 +16,31 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e ".[dev]"
+        run: uv sync --group dev
+
+      - name: Build package
+        run: uv build
 
       - name: Lint
-        run: ruff check .
+        if: ${{ hashFiles('src/**/*.py') != '' }}
+        run: uv run ruff check .
 
       - name: Format check
-        run: ruff format --check .
+        if: ${{ hashFiles('src/**/*.py') != '' }}
+        run: uv run ruff format --check .
 
       - name: Type check
-        run: mypy .
+        if: ${{ hashFiles('src/**/*.py') != '' }}
+        run: uv run mypy .
 
       - name: Test
-        run: pytest
+        if: ${{ hashFiles('tests/**/*.py') != '' }}
+        run: uv run pytest
