@@ -6,10 +6,12 @@ from pybuild import build_parser
 def test_build_parser_accepts_build_command() -> None:
     parser = build_parser()
 
-    args = parser.parse_args(["build", "content", "--output-dir", "dist"])
+    args = parser.parse_args(
+        ["build", "--input-dir", "content", "--output-dir", "dist"]
+    )
 
     assert args.command == "build"
-    assert args.source == "content"
+    assert args.input_dir == "content"
     assert args.output_dir == "dist"
     assert args.clean is False
 
