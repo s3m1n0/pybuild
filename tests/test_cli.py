@@ -1,4 +1,4 @@
-from pybuild import build_parser
+from pybuild.arguments import build_parser
 
 
 def test_build_parser_accepts_build_command() -> None:
